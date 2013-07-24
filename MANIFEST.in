@@ -1,0 +1,3 @@
+include *.rst
+recursive-include hstore_editor/static *
+recursive-include hstore_editor/locale *.mo

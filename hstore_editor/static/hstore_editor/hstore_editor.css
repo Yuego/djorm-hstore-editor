@@ -1,0 +1,17 @@
+
+.hstore-editor ul li {
+    list-style: none;
+}
+
+.hstore-editor a[data-add-item] {
+    margin-left: 21em;
+}
+
+.hstore-editor a[data-add-item]:before {
+    content: '+ ';
+    color: green;
+}
+
+.hstore-editor a[data-del-item] {
+    color: red;
+}
