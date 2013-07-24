@@ -10,8 +10,8 @@ from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-class HstoreEditorWidget(forms.Widget):
 
+class HstoreEditorWidget(forms.Widget):
 
     def __init__(self, *args, **kwargs):
         self._key = kwargs.pop('key_name', 'key')
@@ -20,27 +20,40 @@ class HstoreEditorWidget(forms.Widget):
         self.key_label = kwargs.pop('key_label', _('Key'))
         self.value_label = kwargs.pop('value_label', _('Value'))
         self.add_label = kwargs.pop('add_label', _('add value'))
-        self.del_label = kwargs.pop('del_lable', _('delete value'))
-
+        self.del_label = kwargs.pop('del_label', _('delete value'))
         super(HstoreEditorWidget, self).__init__(*args, **kwargs)
 
-    def _render_field(self, name, value):
-        attrs = self.build_attrs(type='text', name=name, id='id_' + name)
+    def _render_field(self, name, value, attrs=None):
+        attrs = self.build_attrs(attrs, type='text', name=name, id='id_' + name)
         attrs['value'] = force_unicode(value) if value else ''
-
         return '<input{} />'.format(flatatt(attrs))
 
     def _render_item(self, name, idx, k, v):
         k_name = '{}__{}__{}'.format(name, self._key, idx)
         v_name = '{}__{}__{}'.format(name, self._val, idx)
+
+        k_attrs = {
+            'placeholder': self.key_label,
+        }
+        v_attrs = {
+            'placeholder': self.value_label,
+        }
+
+        key_field = self._render_field(k_name, k, k_attrs)
+        value_field = self._render_field(v_name, v, v_attrs)
+
         return ('<li>{}:{}'
                 ' <a href="#" data-del-item="" title="{}">X</a></li>'
-                ''.format(self._render_field(k_name, k), self._render_field(v_name, v), self.del_label))
+                ''.format(key_field, value_field, self.del_label))
 
     def _render_list(self, name, value, attrs):
         items = []
-        for idx, (k, v) in enumerate(value.items()):
-            items.append(self._render_item(name, idx, k, v))
+        idx = 0
+        if value:
+            for idx, (k, v) in enumerate(value.items()):
+                items.append(self._render_item(name, idx, k, v))
+        else:
+            items.append(self._render_item(name, idx, '', ''))
 
         js = """<script type="text/javascript">
             (function($){
@@ -65,12 +78,10 @@ class HstoreEditorWidget(forms.Widget):
             'index': idx,
         }
 
-        html = ('<div class="hstore-editor">%(key_label)s: %(value_label)s'
+        html = ('<div class="hstore-editor">'
                 '<ul%(attrs)s>%(items)s</ul>'
                 '<a href="#" data-add-item="%(id)s">%(add_label)s</a></div>'
                 '') % {'id': attrs['id'],
-                       'key_label': self.key_label,
-                       'value_label': self.value_label,
                        'attrs': flatatt(attrs),
                        'items': ''.join(items),
                        'add_label': self.add_label,
