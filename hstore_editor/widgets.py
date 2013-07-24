@@ -61,15 +61,17 @@ class HstoreEditorWidget(forms.Widget):
                 var item_template = '%(item_template)s';
                 var counter = %(index)i;
 
-                $('[data-add-item=%(id)s]').click(function(){
+                $('[data-add-item=%(id)s]').click(function(e){
                     counter = counter + 1;
                     var new_item = item_template.replace(/IDX/g, counter);
                     var $new_item = $(new_item);
                     $list.append($new_item);
+                    e.preventDefault();
                 });
 
-                $list.on('click', 'a[data-del-item]', function(){
+                $list.on('click', 'a[data-del-item]', function(e){
                     $(this).parent().remove();
+                    e.preventDefault();
                 });
             })(jQuery || django.jQuery);
         </script>""" % {
