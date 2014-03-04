@@ -3,6 +3,7 @@ djorm-hstore-editor
 ================
 
 Поле модели с удобным виджетом для редактирования плоского массива HStore
+Разработка остановлена в пользу (`django-hstore <https://github.com/djangonauts/django-hstore>`_)
 
 
 Установка
